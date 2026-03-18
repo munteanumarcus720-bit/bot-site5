@@ -15,82 +15,73 @@ html, body {
     margin: 0;
     padding: 0;
     height: var(--app-height);
-    width: 100%;
     overflow: hidden;
     font-family: Arial;
-    background: #000;
+    background: #050507;
     color: white;
 }
 
-/* GRID */
+/* 🔥 BACKGROUND GAME STYLE */
 body::before {
     content: "";
     position: fixed;
     inset: 0;
     background:
-        linear-gradient(rgba(0,255,150,0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0,255,150,0.05) 1px, transparent 1px);
-    background-size: 50px 50px;
+        linear-gradient(rgba(0,255,150,0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,255,150,0.06) 1px, transparent 1px);
+    background-size: 60px 60px;
 }
 
-/* GLOW */
 body::after {
     content: "";
     position: fixed;
-    width: 500px;
-    height: 500px;
-    background: radial-gradient(circle, rgba(0,255,150,0.15), transparent);
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    filter: blur(100px);
+    inset: 0;
+    background: radial-gradient(circle at center, rgba(0,255,150,0.15), transparent 60%);
 }
 
 /* CONTAINER */
 .container {
-    position: relative;
-    z-index: 2;
-
     height: 100%;
     display: flex;
     flex-direction: column;
-    align-items: center;
     justify-content: center;
-
-    padding-bottom: 70px; /* 🔥 фикс низа */
-    box-sizing: border-box;
+    align-items: center;
+    padding-bottom: 60px;
 }
 
-/* TEXT */
+/* TITLE */
 .title {
-    font-size: 22px;
+    font-size: 26px;
     font-weight: bold;
+    letter-spacing: 2px;
 }
 
 .subtitle {
-    font-size: 13px;
-    opacity: 0.6;
+    opacity: 0.5;
+    margin-bottom: 20px;
 }
 
-/* CIRCLE */
+/* 🔥 CIRCLE ULTRA */
 .circle {
     position: relative;
-    margin: 40px 0;
-    width: 180px;
-    height: 180px;
+    width: 200px;
+    height: 200px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: radial-gradient(circle,#111,#000);
-    box-shadow: 0 0 20px rgba(0,255,150,0.2);
+    background: radial-gradient(circle, #0a0a0c, #000);
+    box-shadow:
+        0 0 40px rgba(0,255,150,0.2),
+        inset 0 0 30px rgba(0,255,150,0.1);
 }
 
+/* aura */
 .circle::before {
     content: "";
     position: absolute;
-    width: 200px;
-    height: 200px;
+    width: 240px;
+    height: 240px;
     border-radius: 50%;
     border: 2px solid rgba(0,255,150,0.3);
     animation: spin 6s linear infinite;
@@ -99,11 +90,11 @@ body::after {
 .circle::after {
     content: "";
     position: absolute;
-    width: 220px;
-    height: 220px;
+    width: 270px;
+    height: 270px;
     border-radius: 50%;
     border: 1px dashed rgba(0,255,150,0.2);
-    animation: spin 12s linear infinite reverse;
+    animation: spin 14s linear infinite reverse;
 }
 
 @keyframes spin {
@@ -111,27 +102,34 @@ body::after {
     to { transform: rotate(360deg); }
 }
 
+/* VALUE */
 .value {
-    font-size: 32px;
+    font-size: 36px;
     font-weight: bold;
     color: #00ff99;
+    text-shadow:
+        0 0 10px rgba(0,255,150,0.8),
+        0 0 20px rgba(0,255,150,0.5);
 }
 
-/* BUTTON */
+/* 🔥 BUTTON PREMIUM */
 .button {
-    width: 260px;
+    width: 280px;
+    margin-top: 25px;
     padding: 16px;
-    border-radius: 14px;
+    border-radius: 16px;
     background: linear-gradient(90deg,#00ff99,#00c853);
     color: black;
     font-weight: bold;
     text-align: center;
     cursor: pointer;
-    margin-top: 10px;
+    transition: 0.2s;
+    box-shadow: 0 0 25px rgba(0,255,150,0.4);
 }
 
 .button:active {
     transform: scale(0.95);
+    box-shadow: 0 0 10px rgba(0,255,150,0.3);
 }
 
 /* LEVEL */
@@ -142,15 +140,17 @@ body::after {
 .levels button {
     margin: 6px;
     padding: 10px 16px;
-    border-radius: 12px;
+    border-radius: 14px;
     border: none;
-    background: #1a1a1d;
-    color: white;
+    background: #111;
+    color: #aaa;
+    transition: 0.2s;
 }
 
 .active {
     background: #ffd600 !important;
     color: black;
+    box-shadow: 0 0 15px #ffd600;
 }
 
 /* LIVE */
@@ -159,7 +159,7 @@ body::after {
     bottom: 15px;
     left: 20px;
     font-size: 13px;
-    opacity: 0.8;
+    opacity: 0.7;
 }
 </style>
 </head>
@@ -193,25 +193,17 @@ body::after {
 <script>
 const tg = window.Telegram.WebApp;
 
-/* 💣 СТАБИЛЬНЫЙ ФИКС ВЫСОТЫ */
-function setAppHeight() {
-    let height = window.innerHeight;
-
-    if (tg && tg.viewportHeight) {
-        height = tg.viewportHeight;
-    }
-
-    document.documentElement.style.setProperty('--app-height', height + 'px');
+/* 🔥 FIX HEIGHT */
+function setHeight() {
+    let h = window.innerHeight;
+    if (tg && tg.viewportHeight) h = tg.viewportHeight;
+    document.documentElement.style.setProperty('--app-height', h + 'px');
 }
 
 tg.expand();
-
-/* запуск */
-setAppHeight();
-
-/* 🔥 ловим ВСЕ изменения */
-tg.onEvent('viewportChanged', setAppHeight);
-window.addEventListener('resize', setAppHeight);
+setHeight();
+tg.onEvent('viewportChanged', setHeight);
+window.addEventListener('resize', setHeight);
 
 /* LOGIC */
 let level = "medium";
@@ -231,14 +223,13 @@ const data = {
 
 function predict() {
     let el = document.getElementById("result");
-
     el.innerHTML = "...";
 
     setTimeout(() => {
         let arr = data[level];
         let random = arr[Math.floor(Math.random() * arr.length)];
         el.innerHTML = random;
-    }, 1000);
+    }, 900);
 
     let audio = new Audio("https://www.soundjay.com/buttons/sounds/button-16.mp3");
     audio.play();
@@ -246,26 +237,21 @@ function predict() {
     if (navigator.vibrate) navigator.vibrate(100);
 }
 
-const names = ["Alex","Mark","Serioja","Vanea","Dima","Cristinel","MAxxx","Bodea"];
+const names = ["Alex","Mark","John","Ivan","Leo","Chris"];
 
 function liveWins() {
     let name = names[Math.floor(Math.random()*names.length)];
     let x = (Math.random()*5+1).toFixed(2);
-
-    document.getElementById("live").innerHTML =
-        name + " won " + x + "x";
+    document.getElementById("live").innerHTML = name + " won " + x + "x";
 }
 
 setInterval(liveWins, 2000);
 
-/* старт */
 window.onload = () => {
     let el = document.getElementById("result");
     el.innerHTML = "AI ACTIVE";
 
-    setTimeout(() => {
-        el.innerHTML = "AI";
-    }, 1500);
+    setTimeout(() => el.innerHTML = "AI", 1200);
 };
 </script>
 
