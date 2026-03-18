@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<style>
+:root {
+    --app-height: 100vh;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    height: var(--app-height);
+    width: 100%;
+    overflow: hidden;
+    font-family: Arial;
+    background: #000;
+    color: white;
+}
+
+/* GRID */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background:
+        linear-gradient(rgba(0,255,150,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,255,150,0.05) 1px, transparent 1px);
+    background-size: 50px 50px;
+}
+
+/* GLOW */
+body::after {
+    content: "";
+    position: fixed;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(0,255,150,0.15), transparent);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    filter: blur(100px);
+}
+
+/* CONTAINER */
+.container {
+    position: relative;
+    z-index: 2;
+
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    padding-bottom: 70px; /* 🔥 фикс низа */
+    box-sizing: border-box;
+}
+
+/* TEXT */
+.title {
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.subtitle {
+    font-size: 13px;
+    opacity: 0.6;
+}
+
+/* CIRCLE */
+.circle {
+    position: relative;
+    margin: 40px 0;
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle,#111,#000);
+    box-shadow: 0 0 20px rgba(0,255,150,0.2);
+}
+
+.circle::before {
+    content: "";
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    border: 2px solid rgba(0,255,150,0.3);
+    animation: spin 6s linear infinite;
+}
+
+.circle::after {
+    content: "";
+    position: absolute;
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    border: 1px dashed rgba(0,255,150,0.2);
+    animation: spin 12s linear infinite reverse;
+}
+
+@keyframes spin {
+    from { transform: rotate(0); }
+    to { transform: rotate(360deg); }
+}
+
+.value {
+    font-size: 32px;
+    font-weight: bold;
+    color: #00ff99;
+}
+
+/* BUTTON */
+.button {
+    width: 260px;
+    padding: 16px;
+    border-radius: 14px;
+    background: linear-gradient(90deg,#00ff99,#00c853);
+    color: black;
+    font-weight: bold;
+    text-align: center;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.button:active {
+    transform: scale(0.95);
+}
+
+/* LEVEL */
+.levels {
+    margin-top: 15px;
+}
+
+.levels button {
+    margin: 6px;
+    padding: 10px 16px;
+    border-radius: 12px;
+    border: none;
+    background: #1a1a1d;
+    color: white;
+}
+
+.active {
+    background: #ffd600 !important;
+    color: black;
+}
+
+/* LIVE */
+.live {
+    position: absolute;
+    bottom: 15px;
+    left: 20px;
+    font-size: 13px;
+    opacity: 0.8;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="title">HACK BOT</div>
+<div class="subtitle">AI Soft v2.0</div>
+
+<div class="circle">
+    <div id="result" class="value">AI</div>
+</div>
+
+<div class="button" onclick="predict()">PREDICT</div>
+
+<div>Level:</div>
+
+<div class="levels">
+    <button onclick="setLevel('easy')">Easy</button>
+    <button onclick="setLevel('medium')" class="active">Medium</button>
+    <button onclick="setLevel('hard')">Hard</button>
+    <button onclick="setLevel('hardcore')">Hardcore</button>
+</div>
+
+<div id="live" class="live"></div>
+
+</div>
+
+<script>
+const tg = window.Telegram.WebApp;
+
+/* 💣 СТАБИЛЬНЫЙ ФИКС ВЫСОТЫ */
+function setAppHeight() {
+    let height = window.innerHeight;
+
+    if (tg && tg.viewportHeight) {
+        height = tg.viewportHeight;
+    }
+
+    document.documentElement.style.setProperty('--app-height', height + 'px');
+}
+
+tg.expand();
+
+/* запуск */
+setAppHeight();
+
+/* 🔥 ловим ВСЕ изменения */
+tg.onEvent('viewportChanged', setAppHeight);
+window.addEventListener('resize', setAppHeight);
+
+/* LOGIC */
+let level = "medium";
+
+function setLevel(l) {
+    level = l;
+    document.querySelectorAll(".levels button").forEach(b => b.classList.remove("active"));
+    event.target.classList.add("active");
+}
+
+const data = {
+    easy: ["1.30x","1.56x","2.12x","2.70x","2.96x","3.28x","4.11x"],
+    medium: ["1.42x","1.75x","1.98x","2.28x","2.47x","2.70x","3.28x"],
+    hard: ["1.46x","1.83x","2.31x","2.95x","3.82x","5.02x"],
+    hardcore: ["1.44x","2.21x","3.45x"]
+};
+
+function predict() {
+    let el = document.getElementById("result");
+
+    el.innerHTML = "...";
+
+    setTimeout(() => {
+        let arr = data[level];
+        let random = arr[Math.floor(Math.random() * arr.length)];
+        el.innerHTML = random;
+    }, 1000);
+
+    let audio = new Audio("https://www.soundjay.com/buttons/sounds/button-16.mp3");
+    audio.play();
+
+    if (navigator.vibrate) navigator.vibrate(100);
+}
+
+const names = ["Alex","Mark","Serioja","Vanea","Dima","Cristinel","MAxxx","Bodea"];
+
+function liveWins() {
+    let name = names[Math.floor(Math.random()*names.length)];
+    let x = (Math.random()*5+1).toFixed(2);
+
+    document.getElementById("live").innerHTML =
+        name + " won " + x + "x";
+}
+
+setInterval(liveWins, 2000);
+
+/* старт */
+window.onload = () => {
+    let el = document.getElementById("result");
+    el.innerHTML = "AI ACTIVE";
+
+    setTimeout(() => {
+        el.innerHTML = "AI";
+    }, 1500);
+};
+</script>
+
+</body>
+</html>
